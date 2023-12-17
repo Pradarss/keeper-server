@@ -10,9 +10,20 @@ function getCurrentTime(){
   
   }
 
+router.get("/dashboard", (req,res)=>{
+  Todo.find()
+  .then(tasks => {
+    res.json(tasks);
+  })
+  .catch(err => {
+    console.log(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  });
+})
+
 router.post("/dashboard", (req,res)=>{
-  console.log("Received request body:", req.body);
-    const { task, time } = req.body;
+  // console.log("Received request body:", req.body);
+    const { task} = req.body;
 
     const newTask = new Todo({
       task,
@@ -23,7 +34,7 @@ router.post("/dashboard", (req,res)=>{
 
     newTask.save()
     .then(savedTask => {
-      console.log('Task saved successfully');
+      // console.log(savedTask);
       res.status(201).json(savedTask);
     })
     .catch(err => {
