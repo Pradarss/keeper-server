@@ -7,7 +7,6 @@ function getCurrentTime(){
   const date = new Date();
   const options = { hour: '2-digit', minute: '2-digit', hour12: true };
   return date.toLocaleTimeString('en-US', options);
-  
   }
 
 router.get("/dashboard", (req,res)=>{
@@ -26,8 +25,9 @@ router.post("/dashboard", (req,res)=>{
     const { task} = req.body;
 
     const newTask = new Todo({
-      task,
+      task : task,
       time : getCurrentTime(),
+      status : "TODO",
     });
 
     console.log(newTask);
@@ -42,5 +42,7 @@ router.post("/dashboard", (req,res)=>{
       res.status(500).json({ error: 'Internal Server Error' });
     });
 })
+
+
 
 module.exports = router;

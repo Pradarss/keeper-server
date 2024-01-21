@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const todoSchema = mongoose.Schema({
     task: String,
     time: String,
+    status: String,
     // manager_id: String,
 })
 
