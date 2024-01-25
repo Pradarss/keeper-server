@@ -43,6 +43,21 @@ router.post("/dashboard", (req,res)=>{
     });
 })
 
+router.post("/dashboard/doing",(req,res)=>{
+  const {id} = req.body;
+
+  Todo.findByIdAndUpdate(id, { status: 'Doing' }, { new: true })
+
+  .then(updatedTask => {
+    // console.log(savedTask);
+    res.status(201).json(updatedTask);
+  })
+  .catch (err => {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  })
+});
+
 
 
 module.exports = router;
