@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 // const passport = require("passport");
 const cors = require("cors");
 const taskroutes = require("./routes/task");
+const signup=require("./routes/signup");
 
 const app = express();
 const port = 5000;
@@ -20,6 +21,7 @@ app.use(cors({
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use("/",taskroutes);
+app.use("/",signup);
 
 mongoose.connect("mongodb://127.0.0.1:27017/trelloDB", {useNewUrlParser: true})
 .then(function(){
