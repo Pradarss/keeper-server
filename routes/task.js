@@ -9,16 +9,32 @@ function getCurrentTime(){
   return date.toLocaleTimeString('en-US', options);
   }
 
-router.get("/dashboard", (req,res)=>{
-  Todo.find()
-  .then(tasks => {
-    res.json(tasks);
-  })
-  .catch(err => {
-    console.log(err);
-    res.status(500).json({ error: 'Internal Server Error' });
-  });
-})
+// router.get("/dashboard", (req,res)=>{
+//   Todo.find()
+//   .then(tasks => {
+//     res.json(tasks);
+//   })
+//   .catch(err => {
+//     console.log(err);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   });
+// })
+
+router.get("/dashboard", (req, res) => {
+  const { status } = req.query;
+  
+  // Use the status parameter to filter tasks
+  const query = status ? { status } : {};
+
+  Todo.find(query)
+    .then(tasks => {
+      res.json(tasks);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    });
+});
 
 router.post("/dashboard/manager", (req,res)=>{
   // console.log("Received request body:", req.body);
@@ -43,10 +59,11 @@ router.post("/dashboard/manager", (req,res)=>{
     });
 })
 
-router.post("/dashboard/employee/doing",(req,res)=>{
+router.post("/dashboard/employee/:status",(req,res)=>{
   const {id} = req.body;
+  const { status } = req.params;
 
-  Todo.findByIdAndUpdate(id, { status: 'DOING' }, { new: true })
+  Todo.findByIdAndUpdate(id, { status: status.toUpperCase() }, { new: true })
 
   .then(updatedTask => {
     console.log(updatedTask);
