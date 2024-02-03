@@ -75,6 +75,21 @@ router.post("/dashboard/employee/:status",(req,res)=>{
   })
 });
 
+router.delete("/dashboard/manager", (req,res)=>{
+  const {id} = req.body;
+
+  Todo.deleteOne({_id:id})
+
+  .then(deletedTask => {
+    console.log(deletedTask);
+    res.status(201).json(deletedTask);
+  })
+  .catch (err => {
+    console.error(err);
+    res.status(500).json({ error: err.message || 'Internal Server Error' });
+  })
+})
+
 
 
 module.exports = router;
