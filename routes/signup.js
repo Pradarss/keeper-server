@@ -3,8 +3,32 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const Employee = require('../models/users/employee');
 const Manager = require('../models/users/manager');
+const {hashSync}= require('bcrypt');
+const session=require('express-session');
+const mongoStore=require('connect-mongo');
+const passport = require('passport');
+
+var app = express()
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  store: mongoStore.create({mongoUrl : 'mongodb://127.0.0.1:27017/trelloDB', collectionName:"sessions"}),
+  cookie: {
+    maxAge: 1000*60*60*24
+  }
+}))
+
+require('./auth');
+app.use(passport.initialize());
+app.use(passport.session())
 
 router.post("/signup", async (req, res) => {
+    console.log("Request Body:", req.body);
+    // console.log("Request Body:", req.body);
+console.log("UserType:", req.body.UserType);
+
     try {
         const existingEmployee=await Employee.findOne({
             $or: [
@@ -25,11 +49,11 @@ router.post("/signup", async (req, res) => {
             return res.status(409).json({ error: "User with this email or username already exists" });
         }
         let user;
-        if ('manager_id' in req.body) {
+        if (req.body.UserType === 'employee') {
             user = new Employee({
                 email: req.body.email,
                 username: req.body.username,
-                password: req.body.password,
+                password: hashSync(req.body.password,10),
                 manager_id: req.body.manager_id,
             });
         }
@@ -37,7 +61,7 @@ router.post("/signup", async (req, res) => {
             user = new Manager({
                 email: req.body.email,
                 username: req.body.username,
-                password: req.body.password,
+                password: hashSync(req.body.password,10),
             });
         }
         const doc = await user.save();
@@ -50,9 +74,17 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-// router.get("/signup", async (req, res) => {
-//     const docs = await Employee.find({});
-//     res.json(docs);
-// })
+router.get("/signup", async (req, res) => {
+    try {
+        const docs = await Employee.find({});
+        const docs1 = await Manager.find({});
+        res.json({ employees: docs, managers: docs1 });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+router.post("/login",passport.authenticate('local',{successRedirect:'dashboard'}))
 
 module.exports = router;
