@@ -2,7 +2,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 const User = require('../models/users/manager');
-const Employee = require('../models/employees/manager');
+const Employee = require('../models/users/employee');
 const { compareSync } = require('bcrypt');
 
 passport.use('user-local', new LocalStrategy(
