@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-// const passportLocalMongoose = require("passport-local-mongoose");
+const Schema=mongoose.Schema;
+const passportLocalMongoose = require("passport-local-mongoose");
 
 const employeeSchema = mongoose.Schema({
     email: {
@@ -16,7 +17,7 @@ const employeeSchema = mongoose.Schema({
     manager_id: String,
 })
 
-// userSchema.plugin(passportLocalMongoose);
+employeeSchema.plugin(passportLocalMongoose);
 
 Employee = mongoose.model('Employee',employeeSchema);
 
