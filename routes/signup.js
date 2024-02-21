@@ -3,15 +3,15 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const Employee = require('../models/users/employee');
 const Manager = require('../models/users/manager');
-const session=require('express-session');
-const mongoStore=require('connect-mongo');
+// const session=require('express-session');
+// const mongoStore=require('connect-mongo');
 const passport = require('passport');
-const task= require('./task');
+const task = require('./task');
 
 var app = express()
 
 
-app.use(passport.initialize());  
+app.use(passport.initialize());
 app.use(passport.session())
 
 require('./auth');
@@ -21,22 +21,22 @@ router.post("/signup", async (req, res) => {
     console.log("UserType:", req.body.UserType);
 
     try {
-        const existingEmployee=await Employee.findOne({
+        const existingEmployee = await Employee.findOne({
             $or: [
                 { email: req.body.email },
                 { username: req.body.username }
             ]
         });
-        if(existingEmployee){
+        if (existingEmployee) {
             return res.status(409).json({ error: "User with this email or username already exists" });
         }
-        const existingManager=await Manager.findOne({
+        const existingManager = await Manager.findOne({
             $or: [
                 { email: req.body.email },
                 { username: req.body.username }
             ]
         });
-        if(existingManager){
+        if (existingManager) {
             return res.status(409).json({ error: "User with this email or username already exists" });
         }
         let User;
@@ -46,27 +46,27 @@ router.post("/signup", async (req, res) => {
             manager_id: req.body.manager_id, // Include the extra field here
         }
         if (req.body.UserType === 'employee') {
-            User=Employee;
-            userData.manager_id= req.body.manager_id;
+            User = Employee;
+            userData.manager_id = req.body.manager_id;
         }
         else {
-            User=Manager;
+            User = Manager;
         }
 
-        User.register(new User({email: req.body.email, username: req.body.username, }), req.body.password, async(err, user)=>{
-            if(err){
+        User.register(new User({ email: req.body.email, username: req.body.username, }), req.body.password, async (err, user) => {
+            if (err) {
                 console.error(err);
-                return res.status(500).json({error: "Error setting password"});
+                return res.status(500).json({ error: "Error setting password" });
             }
-            passport.authenticate('local')(req,res, function(){
+            passport.authenticate('local')(req, res, function () {
                 res.status(201).json(user);
             })
         });
     }
-        catch(error){
-            console.error(error);
-            res.status(500).json({error: "Internal Server Error"});
-        }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
 router.get("/signup", async (req, res) => {
@@ -80,37 +80,50 @@ router.get("/signup", async (req, res) => {
     }
 });
 
-router.post('/login', (req, res, next) => {
-    const { UserType } = req.body;
-    console.log("Request Body:", req.body);
-    console.log("UserType:", req.body.UserType);
+router.post('/login', async (req, res, next) => {
+    const { username, password } = req.body;
+    console.log(req.body);
 
-    let strategy;
-    if (UserType === 'manager') {
-        strategy = 'manager-local';
-    } else if (UserType === 'employee') {
-        strategy = 'employee-local';
-    } else {
-        return res.status(400).json({ error: "Invalid user type" });
-    }
-
-    passport.authenticate(strategy, { session: false }, (err, user, info) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Internal Server Error" });
+    try {
+        let strategy;
+        const existingEmployee = await Employee.findOne({ username });
+        if (existingEmployee) {
+            strategy = 'employee-local';
+        } else {
+            const existingManager = await Manager.findOne({ username });
+            if (existingManager) {
+                strategy = 'manager-local';
+            }
         }
-        if (!user) {
+        console.log(strategy);
+
+        if (!strategy) {
             return res.status(401).json({ error: "Invalid username or password" });
         }
-        req.logIn(user, function(err) {
+        passport.authenticate(strategy, { session: false }, (err, user, info) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ error: "Internal Server Error" });
             }
-            return res.status(200).json({ message: "Login successful", user: user });
-        });
-    })(req, res, next);
+            if (!user) {
+                return res.status(401).json({ error: "Invalid username or password" });
+            }
+            req.logIn(user, function (err) {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ error: "Internal Server Error" });
+                }
+                return res.status(200).json({ message: "Login successful", user: user });
+            });
+        })(req, res, next);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
 });
+
+
+
 
 
 
