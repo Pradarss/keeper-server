@@ -83,43 +83,52 @@ router.get("/signup", async (req, res) => {
 router.post('/login', async (req, res, next) => {
     const { username, password } = req.body;
     console.log(req.body);
+    const employeeExists= await Employee.exists({username});
+    const managerExists= await Manager.exists({username});
 
-    try {
-        let strategy;
-        const existingEmployee = await Employee.findOne({ username });
-        if (existingEmployee) {
-            strategy = 'employee-local';
-        } else {
-            const existingManager = await Manager.findOne({ username });
-            if (existingManager) {
-                strategy = 'manager-local';
-            }
-        }
-        console.log(strategy);
-
-        if (!strategy) {
-            return res.status(401).json({ error: "Invalid username or password" });
-        }
-        passport.authenticate(strategy, { session: false }, (err, user, info) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ error: "Internal Server Error" });
-            }
-            if (!user) {
-                return res.status(401).json({ error: "Invalid username or password" });
-            }
-            req.logIn(user, function (err) {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({ error: "Internal Server Error" });
-                }
-                return res.status(200).json({ message: "Login successful", user: user });
-            });
-        })(req, res, next);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Internal Server Error" });
+    let strategy;
+    if(employeeExists){
+        strategy='employee-local';
+    }else if(managerExists){
+        strategy='manager-local';
+    }else{
+        console.log("error");
     }
+    console.log(strategy);
+
+    // try {
+        // let strategy;
+        // const existingEmployee = await Employee.findOne({ username });
+        // if (existingEmployee) {
+        //     strategy = 'employee-local';
+        // } else {
+        //     const existingManager = await Manager.findOne({ username });
+        //     if (existingManager) {
+        //         strategy = 'manager-local';
+        //     }
+        // }
+        
+    //     console.log(strategy);
+    //     passport.authenticate(strategy, { session: false }, (err, user, info) => {
+    //         if (err) {
+    //             console.error(err);
+    //             return res.status(500).json({ error: "Internal Server Error" });
+    //         }
+    //         if (!user) {
+    //             return res.status(401).json({ error: "Invalid username or password" });
+    //         }
+    //         req.logIn(user, function (err) {
+    //             if (err) {
+    //                 console.error(err);
+    //                 return res.status(500).json({ error: "Internal Server Error" });
+    //             }
+    //             return res.status(200).json({ message: "Login successful", user: user });
+    //         });
+    //     })(req, res, next);
+    // } catch (error) {
+    //     console.error(error);
+    //     return res.status(500).json({ error: "Internal Server Error" });
+    // }
 });
 
 
