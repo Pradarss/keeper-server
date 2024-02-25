@@ -15,6 +15,8 @@ app.use(passport.initialize());
 app.use(passport.session())
 
 require('./auth');
+
+
 router.post("/signup", async (req, res) => {
     console.log("Request Body:", req.body);
     // console.log("Request Body:", req.body);
@@ -79,51 +81,37 @@ router.get("/signup", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
 router.post('/login', async (req, res, next) => {
     const { Username, password } = req.body;
-    console.log(req.body);
-    console.log(Username);
-    const employeeExists= await Employee.findOne({username: Username});
-    const managerExists= await Manager.findOne({username: Username});
-
-    let strategy;
-    if(employeeExists){
-        strategy='employee-local';
-    }else if(managerExists){
-        strategy='manager-local';
-    }else{
-        console.log("error");
-    }
-    console.log(strategy);
 
     try {
-        
-        passport.authenticate(strategy, { session: false }, (err, user, info) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ error: "Internal Server Error" });
-            }
-            if (!user) {
-                return res.status(401).json({ error: "Invalid username or password" });
-            }
-            req.logIn(user, function (err) {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({ error: "Internal Server Error" });
-                }
-                return res.status(200).json({ message: "Login successful", user: user });
-            });
-        })(req, res, next);
+        const employeeExists = await Employee.findOne({ username: Username });
+        const managerExists = await Manager.findOne({ username: Username });
+
+        let strategy;
+        let authenticatedUser;
+
+        if (employeeExists) {
+            strategy = 'Employee';
+            authenticatedUser = await Employee.authenticate()(Username, password);
+        } else if (managerExists) {
+            strategy = 'Manager';
+            authenticatedUser = await Manager.authenticate()(Username, password);
+        } else {
+            console.log("error");
+            return res.status(401).json({ error: "Invalid username or password" });
+        }
+
+        // Further processing with authenticatedUser...
+        if (authenticatedUser) {
+            return res.status(200).json({ message: "Login successful", user: authenticatedUser });
+        } else {
+            return res.status(401).json({ error: "Invalid username or password" });
+        }
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
-
-
-
-
 
 module.exports = router;
