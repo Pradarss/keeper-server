@@ -104,7 +104,7 @@ router.post('/login', async (req, res, next) => {
 
         // Further processing with authenticatedUser...
         if (authenticatedUser) {
-            return res.status(200).json({ message: "Login successful", user: authenticatedUser });
+            return res.status(200).json({ message: "Login successful", userData : authenticatedUser});
         } else {
             return res.status(401).json({ error: "Invalid username or password" });
         }
