@@ -7,6 +7,7 @@ const Manager = require('../models/users/manager');
 // const mongoStore=require('connect-mongo');
 const passport = require('passport');
 const task = require('./task');
+const { redirect } = require('react-router-dom');
 
 var app = express()
 
@@ -88,14 +89,14 @@ router.post('/login', async (req, res, next) => {
         const employeeExists = await Employee.findOne({ username: Username });
         const managerExists = await Manager.findOne({ username: Username });
 
-        let strategy;
+        let UserType;
         let authenticatedUser;
 
         if (employeeExists) {
-            strategy = 'Employee';
+            UserType = 'Employee';
             authenticatedUser = await Employee.authenticate()(Username, password);
         } else if (managerExists) {
-            strategy = 'Manager';
+            UserType = 'Manager';
             authenticatedUser = await Manager.authenticate()(Username, password);
         } else {
             console.log("error");
@@ -104,7 +105,12 @@ router.post('/login', async (req, res, next) => {
 
         // Further processing with authenticatedUser...
         if (authenticatedUser) {
-            return res.status(200).json({ message: "Login successful", user: authenticatedUser });
+            // console.log("Authenticated user:", authenticatedUser);s
+            if(authenticatedUser.user){
+                // console.log("yes");
+                return res.redirect(`/dashboard?userType=${UserType}`);
+            }
+            // return res.status(200).json({user: authenticatedUser});
         } else {
             return res.status(401).json({ error: "Invalid username or password" });
         }
@@ -113,5 +119,9 @@ router.post('/login', async (req, res, next) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+router.get('/login', async(req, res, next)=>{
+    
+})
 
 module.exports = router;
