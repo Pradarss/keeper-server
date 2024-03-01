@@ -63,6 +63,7 @@ router.post("/signup", async (req, res) => {
             }
             passport.authenticate('local')(req, res, function () {
                 res.status(201).json(user);
+                res.redirect('/dashboard');
             })
         });
     }
