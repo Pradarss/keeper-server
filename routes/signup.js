@@ -42,12 +42,27 @@ router.post("/signup", async (req, res) => {
         if (existingManager) {
             return res.status(409).json({ error: "User with this email or username already exists" });
         }
+        try {
+            // Check if manager_id exists in the Manager collection
+            const manager = await Manager.findOne({ username: req.body.manager_id });
+        
+            // If manager is not found, return an error
+            if (!manager) {
+                return res.status(409).json({ error: "Manager with this username does not exist" });
+            }
+        
+            // Continue with user registration process...
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+        
         let User;
         let userData = {
             email: req.body.email,
             username: req.body.username,
-            manager_id: req.body.manager_id, // Include the extra field here
-        }
+            manager_id: req.body.manager_id, 
+        } 
         if (req.body.UserType === 'employee') {
             User = Employee;
             userData.manager_id = req.body.manager_id;
@@ -56,7 +71,7 @@ router.post("/signup", async (req, res) => {
             User = Manager;
         }
 
-        User.register(new User({ email: req.body.email, username: req.body.username, }), req.body.password, async (err, user) => {
+        User.register(userData, req.body.password, async (err, user) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ error: "Error setting password" });
@@ -83,6 +98,8 @@ router.get("/signup", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+
 router.post('/login', async (req, res, next) => {
     const { Username, password } = req.body;
 
@@ -107,7 +124,7 @@ router.post('/login', async (req, res, next) => {
         // Further processing with authenticatedUser...
         if (authenticatedUser) {
             // console.log("Authenticated user:", authenticatedUser);s
-            if(authenticatedUser.user){
+            if (authenticatedUser.user) {
                 // console.log("yes");
                 return res.redirect(`/dashboard?userType=${UserType}`);
             }
@@ -121,8 +138,8 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-router.get('/login', async(req, res, next)=>{
-    
+router.get('/login', async (req, res, next) => {
+
 })
 
 module.exports = router;

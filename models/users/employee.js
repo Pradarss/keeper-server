@@ -14,7 +14,10 @@ const employeeSchema = mongoose.Schema({
         unique: true
     },
     password: String,
-    manager_id: String,
+    manager_id: {
+        type: String,
+        // required: true,
+    },
 })
 
 employeeSchema.plugin(passportLocalMongoose);
