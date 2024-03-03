@@ -42,8 +42,15 @@ router.post("/signup", async (req, res) => {
         if (existingManager) {
             return res.status(409).json({ error: "User with this email or username already exists" });
         }
-
-        let managerId;
+        
+        let User;
+        let userData = {
+            email: req.body.email,
+            username: req.body.username,
+            manager_id: req.body.manager_id, 
+        } 
+        if (req.body.UserType === 'employee') {
+            let managerId;
         try {
             // Check if manager_id exists in the Manager collection
             const manager = await Manager.findOne({ username: req.body.manager_id });
@@ -59,14 +66,6 @@ router.post("/signup", async (req, res) => {
             console.error(error);
             return res.status(500).json({ error: "Internal Server Error" });
         }
-        
-        let User;
-        let userData = {
-            email: req.body.email,
-            username: req.body.username,
-            manager_id: req.body.manager_id, 
-        } 
-        if (req.body.UserType === 'employee') {
             User = Employee;
             userData.manager_id = managerId;
             userData.userType='employee'
@@ -130,7 +129,7 @@ router.post('/login', async (req, res, next) => {
         if (authenticatedUser) {
             // console.log("Authenticated user:", authenticatedUser);s
             if (authenticatedUser.user) {
-                return res.status(200).json({user: authenticatedUser});
+                return res.status(200).json({user: authenticatedUser, userType: UserType});
             }
         } else {
             return res.status(401).json({ error: "Invalid username or password" });
