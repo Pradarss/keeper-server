@@ -42,9 +42,12 @@ router.post("/signup", async (req, res) => {
         if (existingManager) {
             return res.status(409).json({ error: "User with this email or username already exists" });
         }
+
+        let managerId;
         try {
             // Check if manager_id exists in the Manager collection
             const manager = await Manager.findOne({ username: req.body.manager_id });
+            managerId = manager._id;
         
             // If manager is not found, return an error
             if (!manager) {
@@ -65,7 +68,7 @@ router.post("/signup", async (req, res) => {
         } 
         if (req.body.UserType === 'employee') {
             User = Employee;
-            userData.manager_id = req.body.manager_id;
+            userData.manager_id = managerId;
         }
         else {
             User = Manager;

@@ -15,8 +15,8 @@ const employeeSchema = mongoose.Schema({
     },
     password: String,
     manager_id: {
-        type: String,
-        // required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Manager'
     },
 })
 
