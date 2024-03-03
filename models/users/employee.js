@@ -18,6 +18,7 @@ const employeeSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Manager'
     },
+    userType: String,
 })
 
 employeeSchema.plugin(passportLocalMongoose);

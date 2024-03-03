@@ -13,6 +13,7 @@ const managerSchema = mongoose.Schema({
         unique: true
     },
     password: String,
+    userType: String
 })
 
 managerSchema.plugin(passportLocalMongoose);

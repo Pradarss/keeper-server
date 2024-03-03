@@ -69,9 +69,11 @@ router.post("/signup", async (req, res) => {
         if (req.body.UserType === 'employee') {
             User = Employee;
             userData.manager_id = managerId;
+            userData.userType='employee'
         }
         else {
             User = Manager;
+            userData.userType='manager'
         }
 
         User.register(userData, req.body.password, async (err, user) => {
@@ -81,7 +83,7 @@ router.post("/signup", async (req, res) => {
             }
             passport.authenticate('local')(req, res, function () {
                 res.status(201).json(user);
-                res.redirect('/dashboard');
+                // res.redirect(`/dashboard?userType=${UserType}`);
             })
         });
     }
@@ -114,10 +116,10 @@ router.post('/login', async (req, res, next) => {
         let authenticatedUser;
 
         if (employeeExists) {
-            UserType = 'Employee';
+            UserType = 'employee';
             authenticatedUser = await Employee.authenticate()(Username, password);
         } else if (managerExists) {
-            UserType = 'Manager';
+            UserType = 'manager';
             authenticatedUser = await Manager.authenticate()(Username, password);
         } else {
             console.log("error");
@@ -128,10 +130,8 @@ router.post('/login', async (req, res, next) => {
         if (authenticatedUser) {
             // console.log("Authenticated user:", authenticatedUser);s
             if (authenticatedUser.user) {
-                // console.log("yes");
-                return res.redirect(`/dashboard?userType=${UserType}`);
+                return res.status(200).json({user: authenticatedUser});
             }
-            // return res.status(200).json({user: authenticatedUser});
         } else {
             return res.status(401).json({ error: "Invalid username or password" });
         }
@@ -142,7 +142,7 @@ router.post('/login', async (req, res, next) => {
 });
 
 router.get('/login', async (req, res, next) => {
-
+    
 })
 
 module.exports = router;
