@@ -81,7 +81,8 @@ router.post("/signup", async (req, res) => {
                 return res.status(500).json({ error: "Error setting password" });
             }
             passport.authenticate('local')(req, res, function () {
-                res.status(201).json(user);
+                res.status(201).json({user, userType: userData.userType});
+                // return res.status(200).json({user: authenticatedUser, userType: UserType});
                 // res.redirect(`/dashboard?userType=${UserType}`);
             })
         });
