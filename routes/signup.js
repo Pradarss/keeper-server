@@ -114,13 +114,18 @@ router.post('/login', async (req, res, next) => {
 
         let UserType;
         let authenticatedUser;
+        let otherUser;
 
         if (employeeExists) {
             UserType = 'employee';
+            // console.log(`ObjectId('${employeeExists.manager_id.toString()}')`);
             authenticatedUser = await Employee.authenticate()(Username, password);
+            otherUser = await Manager.findById(employeeExists.manager_id.toString());
         } else if (managerExists) {
             UserType = 'manager';
+            otherUser = await Employee.find({ manager_id: managerExists._id });
             authenticatedUser = await Manager.authenticate()(Username, password);
+            console.log(otherUser);
         } else {
             console.log("error");
             return res.status(401).json({ error: "Invalid username or password" });
@@ -128,9 +133,9 @@ router.post('/login', async (req, res, next) => {
 
         // Further processing with authenticatedUser...
         if (authenticatedUser) {
-            // console.log("Authenticated user:", authenticatedUser);s
+            // console.log("Authenticated user:", authenticatedUser);
             if (authenticatedUser.user) {
-                return res.status(200).json({user: authenticatedUser, userType: UserType});
+                return res.status(200).json({user: authenticatedUser, userType: UserType, OtherUser: otherUser});
             }
         } else {
             return res.status(401).json({ error: "Invalid username or password" });
@@ -141,8 +146,9 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-router.get('/login', async (req, res, next) => {
-    
+router.post('/logout', (req, res) => {
+    // req.logout(); 
+    res.json({ message: 'Logout successful' });
 })
 
 module.exports = router;
