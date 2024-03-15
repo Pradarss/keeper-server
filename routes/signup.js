@@ -68,11 +68,15 @@ router.post("/signup", async (req, res) => {
         }
             User = Employee;
             userData.manager_id = managerId;
-            userData.userType='employee'
+            userData.userType='employee';
+            const otherUser = await Manager.findById(userData.manager_id.toString());
+            userData.OtherUser = otherUser;
         }
         else {
             User = Manager;
-            userData.userType='manager'
+            userData.userType='manager';
+            const otherUser = await Employee.find({ manager_id: existingManager._id });
+            userData.OtherUser = otherUser;
         }
 
         User.register(userData, req.body.password, async (err, user) => {
@@ -80,11 +84,11 @@ router.post("/signup", async (req, res) => {
                 console.error(err);
                 return res.status(500).json({ error: "Error setting password" });
             }
-            passport.authenticate('local')(req, res, function () {
-                res.status(201).json({user, userType: userData.userType});
+            // passport.authenticate('local')(req, res, function () {
+                res.status(201).json({user : {user}, userType: userData.userType,OtherUser: userData.OtherUser});
                 // return res.status(200).json({user: authenticatedUser, userType: UserType});
                 // res.redirect(`/dashboard?userType=${UserType}`);
-            })
+            // })
         });
     }
     catch (error) {
