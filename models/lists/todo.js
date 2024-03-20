@@ -10,7 +10,8 @@ const todoSchema = mongoose.Schema({
         required :  true,
     },
     status: String,
-    // manager_id: String,
+    manager_username: String,
+    employee_username: String,
 })
 
 Todo = mongoose.model('Todo',todoSchema);

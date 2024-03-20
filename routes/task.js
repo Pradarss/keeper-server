@@ -38,12 +38,12 @@ router.get("/dashboard", (req, res) => {
 
 router.post("/dashboard/manager", (req,res)=>{
   // console.log("Received request body:", req.body);
-    const { task} = req.body;
-
+  const { task, manager_username } = req.body;
     const newTask = new Todo({
       task : task,
       time : getCurrentTime(),
       status : "TODO",
+      manager_username: manager_username
     });
 
     console.log(newTask);
@@ -60,10 +60,10 @@ router.post("/dashboard/manager", (req,res)=>{
 })
 
 router.post("/dashboard/employee/:status",(req,res)=>{
-  const {id} = req.body;
+  const {id, employeeUsername} = req.body;
   const { status } = req.params;
 
-  Todo.findByIdAndUpdate(id, { status: status.toUpperCase() }, { new: true })
+  Todo.findByIdAndUpdate(id, { status: status.toUpperCase(), employee_username: employeeUsername }, { new: true })
 
   .then(updatedTask => {
     console.log(updatedTask);
