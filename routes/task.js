@@ -21,20 +21,27 @@ function getCurrentTime(){
 // })
 
 router.get("/dashboard", (req, res) => {
-  const { status } = req.query;
+  const { status, manager_username } = req.query;
   
-  // Use the status parameter to filter tasks
-  const query = status ? { status } : {};
+  // Create a query object with status and manager_username fields
+  const query = {};
+  if (status) {
+    query.status = status;
+  }
+  if (manager_username) {
+    query.manager_username = manager_username;
+  }
 
   Todo.find(query)
     .then(tasks => {
       res.json(tasks);
     })
     .catch(err => {
-      console.log(err);
+      console.error(err);
       res.status(500).json({ error: 'Internal Server Error' });
     });
 });
+
 
 router.post("/dashboard/manager", (req,res)=>{
   // console.log("Received request body:", req.body);
