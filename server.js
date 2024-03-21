@@ -1,4 +1,4 @@
-// require('dotenv').config();
+require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 app.use("/",taskroutes);
 app.use("/",signup);
 
-mongoose.connect("mongodb://127.0.0.1:27017/trelloDB", {useNewUrlParser: true})
+mongoose.connect(`mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.mp4r9kt.mongodb.net/TrelloDB?retryWrites=true&w=majority&appName=Cluster0`)
 .then(function(){
     console.log("Successfully connected to mongoDB")
 })

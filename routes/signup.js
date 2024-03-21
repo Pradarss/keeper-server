@@ -75,8 +75,11 @@ router.post("/signup", async (req, res) => {
         else {
             User = Manager;
             userData.userType='manager';
-            const otherUser = await Employee.find({ manager_id: existingManager._id });
-            userData.OtherUser = otherUser;
+            // console.log(existingManager._id);
+            // if(existingManager._id){
+            //     const otherUser = await Employee.find({ manager_id: existingManager._id });
+            // }
+            userData.OtherUser = [];
         }
 
         User.register(userData, req.body.password, async (err, user) => {
@@ -124,7 +127,7 @@ router.post('/login', async (req, res, next) => {
             UserType = 'employee';
             // console.log(`ObjectId('${employeeExists.manager_id.toString()}')`);
             authenticatedUser = await Employee.authenticate()(Username, password);
-            otherUser = await Manager.findById(employeeExists.manager_id.toString());
+            otherUser = await Manager.findById(employeeExists.manager_id);
         } else if (managerExists) {
             UserType = 'manager';
             otherUser = await Employee.find({ manager_id: managerExists._id });
@@ -142,7 +145,7 @@ router.post('/login', async (req, res, next) => {
                 return res.status(200).json({user: authenticatedUser, userType: UserType, OtherUser: otherUser});
             }
         } else {
-            return res.status(401).json({ error: "Invalid username or password" });
+            return res.status(404).json({ error: "Invalid username or password" });
         }
     } catch (error) {
         console.error(error);
