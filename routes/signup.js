@@ -3,11 +3,8 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const Employee = require('../models/users/employee');
 const Manager = require('../models/users/manager');
-// const session=require('express-session');
-// const mongoStore=require('connect-mongo');
 const passport = require('passport');
 const task = require('./task');
-const { redirect } = require('react-router-dom');
 
 var app = express()
 
@@ -20,7 +17,6 @@ require('./auth');
 
 router.post("/signup", async (req, res) => {
     console.log("Request Body:", req.body);
-    // console.log("Request Body:", req.body);
     console.log("UserType:", req.body.UserType);
 
     try {
@@ -52,16 +48,11 @@ router.post("/signup", async (req, res) => {
         if (req.body.UserType === 'employee') {
             let managerId;
         try {
-            // Check if manager_id exists in the Manager collection
             const manager = await Manager.findOne({ username: req.body.manager_id });
             managerId = manager._id;
-        
-            // If manager is not found, return an error
             if (!manager) {
                 return res.status(409).json({ error: "Manager with this username does not exist" });
             }
-        
-            // Continue with user registration process...
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: "Internal Server Error" });
@@ -75,10 +66,6 @@ router.post("/signup", async (req, res) => {
         else {
             User = Manager;
             userData.userType='manager';
-            // console.log(existingManager._id);
-            // if(existingManager._id){
-            //     const otherUser = await Employee.find({ manager_id: existingManager._id });
-            // }
             userData.OtherUser = [];
         }
 
@@ -87,11 +74,7 @@ router.post("/signup", async (req, res) => {
                 console.error(err);
                 return res.status(500).json({ error: "Error setting password" });
             }
-            // passport.authenticate('local')(req, res, function () {
                 res.status(201).json({user : {user}, userType: userData.userType,OtherUser: userData.OtherUser});
-                // return res.status(200).json({user: authenticatedUser, userType: UserType});
-                // res.redirect(`/dashboard?userType=${UserType}`);
-            // })
         });
     }
     catch (error) {
@@ -125,7 +108,6 @@ router.post('/login', async (req, res, next) => {
 
         if (employeeExists) {
             UserType = 'employee';
-            // console.log(`ObjectId('${employeeExists.manager_id.toString()}')`);
             authenticatedUser = await Employee.authenticate()(Username, password);
             otherUser = await Manager.findById(employeeExists.manager_id);
         } else if (managerExists) {
@@ -137,10 +119,7 @@ router.post('/login', async (req, res, next) => {
             console.log("error");
             return res.status(401).json({ error: "Invalid username or password" });
         }
-
-        // Further processing with authenticatedUser...
         if (authenticatedUser) {
-            // console.log("Authenticated user:", authenticatedUser);
             if (authenticatedUser.user) {
                 return res.status(200).json({user: authenticatedUser, userType: UserType, OtherUser: otherUser});
             }
@@ -154,7 +133,6 @@ router.post('/login', async (req, res, next) => {
 });
 
 router.post('/logout', (req, res) => {
-    // req.logout(); 
     res.json({ message: 'Logout successful' });
 })
 

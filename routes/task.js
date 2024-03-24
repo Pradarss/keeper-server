@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Todo = require('../models/lists/todo');
-// const getCurrentTime = require('../time');
 
 function getCurrentTime(){
   const date = new Date();
@@ -9,21 +8,8 @@ function getCurrentTime(){
   return date.toLocaleTimeString('en-US', options);
   }
 
-// router.get("/dashboard", (req,res)=>{
-//   Todo.find()
-//   .then(tasks => {
-//     res.json(tasks);
-//   })
-//   .catch(err => {
-//     console.log(err);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   });
-// })
-
 router.get("/dashboard", (req, res) => {
   const { status, manager_username } = req.query;
-  
-  // Create a query object with status and manager_username fields
   const query = {};
   if (status) {
     query.status = status;
@@ -44,7 +30,6 @@ router.get("/dashboard", (req, res) => {
 
 
 router.post("/dashboard/manager", (req,res)=>{
-  // console.log("Received request body:", req.body);
   const { task, manager_username } = req.body;
     const newTask = new Todo({
       task : task,
@@ -57,7 +42,6 @@ router.post("/dashboard/manager", (req,res)=>{
 
     newTask.save()
     .then(savedTask => {
-      // console.log(savedTask);
       res.status(201).json(savedTask);
     })
     .catch(err => {

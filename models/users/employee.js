@@ -5,12 +5,12 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const employeeSchema = mongoose.Schema({
     email: {
         type: String,
-        // required: true,
+        required: true,
         unique: true,
     },
     username: {
         type: String,
-        // required: true,
+        required: true,
         unique: true
     },
     password: String,

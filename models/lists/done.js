@@ -7,8 +7,6 @@ const doneSchema = mongoose.Schema({
     employee_id: String,
 })
 
-// userSchema.plugin(passportLocalMongoose);
-
 Done = mongoose.model('Done',doneSchema);
 
 module.exports = Done;
