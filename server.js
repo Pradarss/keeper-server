@@ -13,7 +13,7 @@ const app = express();
 const port = 5000;
 
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: "http://trello001.netlify.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     optionsSuccessStatus: 204,
