@@ -13,7 +13,7 @@ const app = express();
 const port = 5000;
 
 app.use(cors({
-    origin: "http://trello001.netlify.app",
+    origin: "http://localhost:3000",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     optionsSuccessStatus: 204,
@@ -24,7 +24,8 @@ app.use(bodyParser.json());
 app.use("/",taskroutes);
 app.use("/",signup);
 
-mongoose.connect(`mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.mp4r9kt.mongodb.net/TrelloDB?retryWrites=true&w=majority&appName=Cluster0`)
+// mongoose.connect(`mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.mp4r9kt.mongodb.net/TrelloDB?retryWrites=true&w=majority&appName=Cluster0`)
+mongoose.connect("mongodb://localhost:27017/trelloDB")
 .then(function(){
     console.log("Successfully connected to mongoDB")
 })
