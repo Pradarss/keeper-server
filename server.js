@@ -25,14 +25,15 @@ app.use("/",taskroutes);
 app.use("/",signup);
 
 // mongoose.connect(`mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.mp4r9kt.mongodb.net/TrelloDB?retryWrites=true&w=majority&appName=Cluster0`)
-mongoose.connect("mongodb://localhost:27017/trelloDB")
+mongoose.connect("mongodb://127.0.0.1:27017/trelloDB", { useNewUrlParser: true, useUnifiedTopology: true })
 .then(function(){
     console.log("Successfully connected to mongoDB")
 })
 .catch(function(err){
+    // console.log("error");
     console.log(err);
 })
 
 app.listen(port, function() {
     console.log("Server started on port 5000");
-  });
+});
